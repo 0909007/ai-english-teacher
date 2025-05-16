@@ -1,20 +1,41 @@
-window.onload = () => {
-  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-  recognition.lang = 'en-US';  // 영어 인식
-  recognition.interimResults = false;  // 중간 결과 미사용
-  recognition.continuous = true;       // 계속 인식 모드
+const output = document.getElementById('output');
+const response = document.getElementById('response');
 
-  recognition.onresult = event => {
-    const last = event.results.length - 1;
-    const text = event.results[last][0].transcript.trim();
-    console.log('사용자 음성 인식:', text);
-    document.getElementById('userText').innerText = `너가 말한 문장: ${text}`;
-    // TODO: GPT API 호출 넣기
-  };
+function startListening() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert('이 브라우저는 음성 인식을 지원하지 않습니다.');
+    return;
+  }
 
-  recognition.onerror = event => {
-    console.error('음성 인식 에러:', event.error);
-  };
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
 
   recognition.start();
-};
+
+  recognition.onresult = async (event) => {
+    const transcript = event.results[0][0].transcript;
+    output.textContent = transcript;
+
+    // GPT API에 텍스트 보내기
+    try {
+      const res = await fetch('/functions/gpt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: transcript }),
+      });
+
+      const data = await res.json();
+      response.textContent = data.reply || '답변을 받지 못했습니다.';
+    } catch (error) {
+      response.textContent = '서버와 통신 중 오류가 발생했습니다.';
+      console.error(error);
+    }
+  };
+
+  recognition.onerror = (event) => {
+    output.textContent = '음성 인식 중 오류: ' + event.error;
+  };
+}
