@@ -1,1 +1,2 @@
-에이아이 선생님
+# AI English Teacher
+This is a web app for practicing English with an AI tutor.

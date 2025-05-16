@@ -1,0 +1,1 @@
+// JS placeholder for AI teacher logic
