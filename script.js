@@ -1,4 +1,4 @@
-const apiKey = "여기에_너의_DID_API_KEY_넣기";
+const apiKey = "MDkwOTAwN0BnbWFpbC5jb20:iNgYT-9Tz2Jv3VipKlmSR";
 const imageUrl = "https://raw.githubusercontent.com/0909007/ai-english-teacher/main/teacher.jpg";
 
 async function startListening() {
@@ -14,7 +14,7 @@ async function startListening() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer 여기에_너의_ChatGPT_API_Key"
+        "Authorization": "Bearer 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"
       },
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
