@@ -1,61 +1,20 @@
-const apiKey = "MDkwOTAwN0BnbWFpbC5jb20:iNgYT-9Tz2Jv3VipKlmSR";
-const imageUrl = "https://raw.githubusercontent.com/0909007/ai-english-teacher/main/teacher.jpg";
-
-async function startListening() {
+window.onload = () => {
   const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-  recognition.lang = 'en-US';
-  recognition.start();
+  recognition.lang = 'en-US';  // 영어 인식
+  recognition.interimResults = false;  // 중간 결과 미사용
+  recognition.continuous = true;       // 계속 인식 모드
 
-  recognition.onresult = async function(event) {
-    const userSpeech = event.results[0][0].transcript;
-    console.log("🎧 You said:", userSpeech);
-
-    const gptReply = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer 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"
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [
-          { role: "system", content: "You are a friendly English teacher speaking simply." },
-          { role: "user", content: userSpeech }
-        ]
-      })
-    }).then(res => res.json());
-
-    const replyText = gptReply.choices[0].message.content;
-    console.log("🧠 GPT:", replyText);
-
-    // D-ID API 호출
-    const videoRes = await fetch("https://api.d-id.com/talks", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        script: { type: "text", input: replyText, provider: { type: "microsoft", voice_id: "en-US-JennyNeural" } },
-        source_url: imageUrl
-      })
-    }).then(res => res.json());
-
-    const videoId = videoRes.id;
-
-    // 영상 주소 가져오기
-    const checkVideo = async () => {
-      const status = await fetch(`https://api.d-id.com/talks/${videoId}`, {
-        headers: { Authorization: `Bearer ${apiKey}` }
-      }).then(res => res.json());
-
-      if (status.result_url) {
-        document.getElementById("video").src = status.result_url;
-      } else {
-        setTimeout(checkVideo, 1000);
-      }
-    };
-
-    checkVideo();
+  recognition.onresult = event => {
+    const last = event.results.length - 1;
+    const text = event.results[last][0].transcript.trim();
+    console.log('사용자 음성 인식:', text);
+    document.getElementById('userText').innerText = `너가 말한 문장: ${text}`;
+    // TODO: GPT API 호출 넣기
   };
-}
+
+  recognition.onerror = event => {
+    console.error('음성 인식 에러:', event.error);
+  };
+
+  recognition.start();
+};
