@@ -20,7 +20,7 @@ export async function onRequest(context) {
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        messages,
+        messages: messages,
         max_tokens: 100,
         temperature: 0.7,
       }),
