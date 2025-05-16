@@ -2,23 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AI English Teacher</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI 영어 선생님</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 2rem; background: #f5f5f5; }
+    video { width: 360px; border-radius: 1rem; margin-top: 1rem; }
+    button { padding: 1rem; font-size: 1.2rem; background: #4caf50; color: white; border: none; border-radius: 1rem; }
+  </style>
 </head>
 <body>
-  <div id="app">
-    <h1>AI English Teacher</h1>
-    <div id="face-container">
-      <!-- 얼굴 애니메이션 영역 -->
-      <canvas id="face-canvas" width="300" height="300"></canvas>
-    </div>
-    <div id="chat-container"></div>
-    <input type="text" id="input-field" placeholder="Type your message here" />
-    <button id="send-button">Send</button>
-    <button id="voice-button">🎤 Speak</button>
-  </div>
+  <h1>👩‍🏫 AI 영어 선생님</h1>
+  <p>마이크에 대고 말해보세요!</p>
+  <button onclick="startListening()">🎤 말하기 시작</button>
+  <video id="video" controls autoplay muted></video>
 
-  <script type="module" src="./main.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
