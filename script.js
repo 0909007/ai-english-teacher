@@ -36,7 +36,7 @@ recognition.onresult = async (event) => {
   const transcript = event.results[0][0].transcript;
   resultDiv.textContent = "내 말: " + transcript;
 
-  // GPT에 메시지 보내기
+  // GPT에 메시지 보내기 (system 역할 포함)
   const messages = [
     { role: "system", content: "You are a helpful AI English teacher." },
     { role: "user", content: transcript },
@@ -49,7 +49,7 @@ recognition.onresult = async (event) => {
 // GPT API 호출 함수
 async function fetchGPTResponse(messages) {
   try {
-    const response = await fetch("/api/gpt", {
+    const response = await fetch("/functions/gpt", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ messages }),
