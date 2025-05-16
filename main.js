@@ -55,7 +55,7 @@ async function getGPTResponse(text) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer YOUR_OPENAI_API_KEY'
+        'Authorization': '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'
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
