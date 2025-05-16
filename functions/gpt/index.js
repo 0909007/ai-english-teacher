@@ -1,33 +1,39 @@
-import { OpenAI } from "openai";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,  // 환경변수에서 API 키 읽음
-});
-
 export async function onRequest(context) {
-  const { request } = context;
-  const body = await request.json();
-
-  if (!body.messages) {
-    return new Response(
-      JSON.stringify({ error: "Missing messages in request body" }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
-    );
-  }
+  const { request, env } = context;
+  const OPENAI_API_KEY = env.OPENAI_API_KEY;
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: body.messages,
+    const body = await request.json();
+    const prompt = body.prompt || "";
+
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 100,
+        temperature: 0.7,
+      }),
     });
 
+    if (!response.ok) {
+      const error = await response.text();
+      return new Response(error, { status: response.status });
+    }
+
+    const data = await response.json();
+
     return new Response(
-      JSON.stringify(completion.choices[0].message),
+      JSON.stringify({ text: data.choices[0].message.content }),
       { headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message || String(error) }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
