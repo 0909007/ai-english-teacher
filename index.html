@@ -6,52 +6,121 @@
   <title>AI 영어 선생님</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: Arial, sans-serif;
       text-align: center;
-      background: #f7f7f7;
-      padding: 40px;
-    }
-    #teacher-face {
-      width: 200px;
-      border-radius: 20px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      user-select: none;
-      margin-bottom: 20px;
+      margin: 20px;
     }
     #micButton {
-      background-color: #28a745;
+      background-color: #4caf50;
       color: white;
       border: none;
-      padding: 12px 20px;
+      padding: 12px 24px;
+      border-radius: 8px;
       font-size: 18px;
-      border-radius: 15px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
     }
     #micButton.listening {
-      background-color: #dc3545;
+      background-color: #d32f2f;
     }
     #result {
-      margin-top: 30px;
-      background: white;
-      border-radius: 10px;
-      padding: 20px;
+      white-space: pre-line;
+      margin-top: 20px;
       font-size: 20px;
-      min-height: 60px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-      white-space: pre-wrap;
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 8px;
+      display: inline-block;
+      text-align: left;
+      min-width: 300px;
+      max-width: 600px;
+    }
+    img {
+      width: 200px;
+      border-radius: 16px;
+      margin-top: 20px;
+      object-fit: cover;
+    }
+    h1 {
+      font-weight: bold;
+      margin-bottom: 5px;
     }
   </style>
 </head>
 <body>
   <h1>🎓 AI 영어 선생님</h1>
-
-  <img src="teacher.jpg" alt="AI 선생님" id="teacher-face" />
-
+  <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=400&q=80" alt="AI 선생님 사진" />
+  <br />
   <button id="micButton">🎤 말하기 시작</button>
 
-  <pre id="result">마이크 버튼을 눌러서 말해보세요.</pre>
+  <div id="result">내 말: <br />AI 선생님:</div>
 
-  <script src="script.js"></script>
+  <script>
+    // 음성 인식 설정
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.continuous = false;
+
+    const resultDiv = document.getElementById("result");
+    const micButton = document.getElementById("micButton");
+
+    let listening = false;
+
+    micButton.addEventListener("click", () => {
+      if (!listening) {
+        recognition.start();
+      } else {
+        recognition.stop();
+      }
+    });
+
+    recognition.onstart = () => {
+      listening = true;
+      micButton.classList.add("listening");
+      micButton.textContent = "듣는 중...";
+    };
+
+    recognition.onend = () => {
+      listening = false;
+      micButton.classList.remove("listening");
+      micButton.textContent = "🎤 말하기 시작";
+    };
+
+    recognition.onresult = async (event) => {
+      const transcript = event.results[0][0].transcript;
+      resultDiv.textContent = "내 말: " + transcript + "\nAI 선생님: ...응답 대기중...";
+
+      // GPT에 메시지 보내기
+      const messages = [
+        { role: "system", content: "You are a helpful AI English teacher." },
+        { role: "user", content: transcript },
+      ];
+
+      const reply = await fetchGPTResponse(messages);
+      resultDiv.textContent = "내 말: " + transcript + "\nAI 선생님: " + reply;
+    };
+
+    async function fetchGPTResponse(messages) {
+      try {
+        const response = await fetch("/api/gpt", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages }),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          console.error("GPT API error:", error);
+          return "오류 발생: " + error.error;
+        }
+
+        const data = await response.json();
+        return data.content;
+      } catch (e) {
+        console.error("Fetch error:", e);
+        return "네트워크 오류 또는 서버에 연결할 수 없습니다.";
+      }
+    }
+  </script>
 </body>
 </html>
