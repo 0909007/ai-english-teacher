@@ -1,5 +1,13 @@
 export async function onRequest(context) {
   const { request, env } = context;
+
+  if (request.method !== "POST") {
+    return new Response(
+      JSON.stringify({ error: "Method Not Allowed" }),
+      { status: 405, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
   const OPENAI_API_KEY = env.OPENAI_API_KEY;
 
   if (!OPENAI_API_KEY) {
