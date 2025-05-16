@@ -1,23 +1,31 @@
-export async function onRequestPost(context) {
-  const body = await context.request.json();
-  const userMessage = body.message;
+import { OpenAI } from "openai";
 
-  const apiKey = context.env.OPENAI_API_KEY;
+export async function onRequest(context) {
+  const { request, env } = context;
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${apiKey}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: userMessage }]
-    })
-  });
+  try {
+    const { message } = await request.json();
+    const openai = new OpenAI({
+      apiKey: env.OPENAI_API_KEY,
+    });
 
-  const result = await response.json();
-  return new Response(JSON.stringify(result), {
-    headers: { "Content-Type": "application/json" }
-  });
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: "너는 친절한 영어 선생님이야." },
+        { role: "user", content: message },
+      ],
+    });
+
+    const reply = completion.choices[0].message.content;
+
+    return new Response(JSON.stringify({ reply }), {
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ error: error.message || "오류 발생" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
 }
