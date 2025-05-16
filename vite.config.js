@@ -1,8 +1,8 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: './',  // 상대경로로 빌드해서 경로 문제 방지
+  base: './',
   build: {
-    outDir: 'dist',  // 빌드 산출물 폴더 지정
+    outDir: 'dist',
   },
-})
+});
