@@ -1,41 +1,39 @@
+const micButton = document.getElementById('micButton');
 const output = document.getElementById('output');
 const response = document.getElementById('response');
 
+// 음성 인식 객체 생성 (크롬 기준)
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
+
+recognition.lang = 'en-US';
+recognition.interimResults = false;
+
+recognition.onstart = () => {
+  micButton.classList.add('listening');
+  micButton.textContent = '🔴 듣는 중...';
+};
+
+recognition.onend = () => {
+  micButton.classList.remove('listening');
+  micButton.textContent = '🎤 말하기 시작';
+};
+
+recognition.onerror = (event) => {
+  micButton.classList.remove('listening');
+  micButton.textContent = '🎤 말하기 시작';
+  output.textContent = '에러 발생: ' + event.error;
+};
+
+recognition.onresult = async (event) => {
+  const transcript = event.results[0][0].transcript;
+  output.textContent = '당신: ' + transcript;
+
+  // 여기에 OpenAI API 호출하는 부분 넣기 (예시)
+  // 예) const reply = await askOpenAI(transcript);
+  // response.textContent = 'AI: ' + reply;
+};
+
 function startListening() {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    alert('이 브라우저는 음성 인식을 지원하지 않습니다.');
-    return;
-  }
-
-  const recognition = new SpeechRecognition();
-  recognition.lang = 'en-US';
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-
   recognition.start();
-
-  recognition.onresult = async (event) => {
-    const transcript = event.results[0][0].transcript;
-    output.textContent = transcript;
-
-    // GPT API에 텍스트 보내기
-    try {
-      const res = await fetch('/functions/gpt', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: transcript }),
-      });
-
-      const data = await res.json();
-      response.textContent = data.reply || '답변을 받지 못했습니다.';
-    } catch (error) {
-      response.textContent = '서버와 통신 중 오류가 발생했습니다.';
-      console.error(error);
-    }
-  };
-
-  recognition.onerror = (event) => {
-    output.textContent = '음성 인식 중 오류: ' + event.error;
-  };
 }
