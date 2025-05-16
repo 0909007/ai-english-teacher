@@ -1,48 +1,70 @@
-const startBtn = document.getElementById("startBtn");
-const output = document.getElementById("output");
-
+// 음성 인식 설정
 const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
 recognition.lang = "en-US";
 recognition.interimResults = false;
-recognition.maxAlternatives = 1;
+recognition.continuous = false;
 
-let isListening = false;
+const resultDiv = document.getElementById("result");
+const micButton = document.getElementById("micButton");
 
-startBtn.addEventListener("click", () => {
-  if (!isListening) {
+let listening = false;
+
+micButton.addEventListener("click", () => {
+  if (!listening) {
     recognition.start();
+  } else {
+    recognition.stop();
   }
 });
 
+// 음성 인식 시작
 recognition.onstart = () => {
-  isListening = true;
-  startBtn.classList.add("listening");
-  startBtn.textContent = "🎤 듣는 중...";
+  listening = true;
+  micButton.style.backgroundColor = "#4caf50"; // 녹색으로 바꿈
+  micButton.textContent = "듣는 중...";
 };
 
+// 음성 인식 종료
 recognition.onend = () => {
-  isListening = false;
-  startBtn.classList.remove("listening");
-  startBtn.textContent = "말하기 시작";
+  listening = false;
+  micButton.style.backgroundColor = ""; // 원래색으로
+  micButton.textContent = "🎤 말하기 시작";
 };
 
+// 음성 인식 결과 받기
 recognition.onresult = async (event) => {
   const transcript = event.results[0][0].transcript;
-  output.innerText = "🧑‍🎤 나: " + transcript;
+  resultDiv.textContent = "내 말: " + transcript;
 
-  const reply = await getChatGPTResponse(transcript);
-  setTimeout(() => {
-    output.innerText += "\n🤖 선생님: " + reply;
-  }, 500);
+  // GPT에 메시지 보내기
+  const messages = [
+    { role: "system", content: "You are a helpful AI English teacher." },
+    { role: "user", content: transcript },
+  ];
+
+  const reply = await fetchGPTResponse(messages);
+  resultDiv.textContent += "\nAI 선생님: " + reply;
 };
 
-async function getChatGPTResponse(text) {
-  const res = await fetch("/functions/gpt", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text })
-  });
+// GPT API 호출 함수
+async function fetchGPTResponse(messages) {
+  try {
+    const response = await fetch("/api/gpt", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages }),
+    });
 
-  const data = await res.json();
-  return data.reply;
+    if (!response.ok) {
+      const error = await response.json();
+      console.error("GPT API error:", error);
+      return "오류 발생: " + error.error;
+    }
+
+    const data = await response.json();
+    return data.content;
+  } catch (e) {
+    console.error("Fetch error:", e);
+    return "네트워크 오류 또는 서버에 연결할 수 없습니다.";
+  }
 }
