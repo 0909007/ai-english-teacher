@@ -143,4 +143,7 @@ function drawFace(mouthRatio) {
 
 function startSpeechRecognition() {
   recognition.start();
+
+  console.log('main.js loaded');
+document.getElementById('chat-container').textContent = 'JS 작동 중!';
 }
