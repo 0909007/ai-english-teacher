@@ -10,7 +10,7 @@ export async function onRequest(context) {
   }
 
   try {
-    const { prompt } = await request.json();
+    const { messages } = await request.json();
 
     const apiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -20,7 +20,7 @@ export async function onRequest(context) {
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        messages: [{ role: "user", content: prompt }],
+        messages,
         max_tokens: 100,
         temperature: 0.7,
       }),
@@ -37,7 +37,7 @@ export async function onRequest(context) {
     const data = await apiResponse.json();
 
     return new Response(
-      JSON.stringify({ text: data.choices[0].message.content }),
+      JSON.stringify({ content: data.choices[0].message.content }),
       { headers: { "Content-Type": "application/json" } }
     );
 
