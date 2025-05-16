@@ -2,19 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AI 영어 선생님</title>
   <style>
-    body { font-family: sans-serif; text-align: center; background: #fff; padding: 2rem; }
-    img { width: 300px; border-radius: 1rem; }
-    #response { margin-top: 1rem; font-size: 1.2rem; color: #333; }
+    body { font-family: sans-serif; text-align: center; padding: 2rem; }
+    #output, #response { margin: 1rem auto; padding: 1rem; max-width: 400px; border-radius: 8px; }
+    #output { background: #f0f0f0; }
+    #response { background: #d0f0d0; }
+    button { padding: 1rem 2rem; font-size: 1.2rem; border-radius: 8px; cursor: pointer; }
   </style>
 </head>
 <body>
   <h1>👩‍🏫 AI 영어 선생님</h1>
-  <p>AI 선생님과 대화를 시작해보세요!</p>
-  <img src="teacher.jpg" alt="AI 선생님" />
-  <p id="response">선생님: 안녕하세요! 무엇을 도와드릴까요?</p>
+  <p>마이크에 대고 말해보세요!</p>
+  <button onclick="startListening()">🎤 말하기 시작</button>
+  
+  <div id="output">여기에 당신이 말한 문장이 표시됩니다.</div>
+  <div id="response">여기에 AI 선생님의 답변이 표시됩니다.</div>
+
   <script src="script.js"></script>
 </body>
 </html>
