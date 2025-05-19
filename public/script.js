@@ -7,23 +7,19 @@ const startRecognition = () => {
 
   recognition.onresult = async (event) => {
     const transcript = event.results[0][0].transcript;
-    output.innerHTML = `<strong>내 말:</strong> ${transcript}<br><strong>AI 선생님:</strong> ...`;
+    output.innerHTML = `내 말: ${transcript}\nAI 선생님: ...`;
 
     try {
-      const res = await fetch("/functions/gpt", {
+      const res = await fetch("/api/gpt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user: transcript })
       });
 
       const data = await res.json();
-      if (data.result) {
-        output.innerHTML = `<strong>내 말:</strong> ${transcript}<br><strong>AI 선생님:</strong> ${data.result}`;
-      } else {
-        output.innerHTML = `<strong>내 말:</strong> ${transcript}<br><strong>AI 선생님:</strong> 오류가 발생했습니다.`;
-      }
+      output.innerHTML = `내 말: ${transcript}\nAI 선생님: ${data.result || "응답을 받지 못했어요."}`;
     } catch (err) {
-      output.innerHTML = `<strong>내 말:</strong> ${transcript}<br><strong>AI 선생님:</strong> 서버에 연결할 수 없습니다.`;
+      output.innerHTML = `내 말: ${transcript}\nAI 선생님: 네트워크 오류 또는 서버에 연결할 수 없습니다.`;
     }
   };
 };
