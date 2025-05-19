@@ -2,13 +2,12 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI 영어 선생님</title>
   <style>
-    body { font-family: sans-serif; text-align: center; background: #eee; }
-    img { border-radius: 16px; width: 200px; }
-    #output { width: 80%; margin: 20px auto; padding: 10px; background: white; border-radius: 10px; min-height: 100px; }
-    button { padding: 10px 20px; font-size: 1.2em; margin-top: 10px; }
+    body { text-align: center; font-family: sans-serif; background: #f5f5f5; }
+    img { width: 200px; border-radius: 20px; box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
+    button { padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 10px; cursor: pointer; margin-top: 20px; }
+    #output { margin-top: 30px; font-size: 1.1em; white-space: pre-line; }
   </style>
 </head>
 <body>
@@ -16,8 +15,7 @@
   <img src="teacher.jpg" alt="AI 선생님" />
   <br />
   <button onclick="startRecognition()">🎤 말하기 시작</button>
-  <div id="output"><strong>내 말:</strong><br /><strong>AI 선생님:</strong></div>
-
+  <div id="output"></div>
   <script src="script.js"></script>
 </body>
 </html>
